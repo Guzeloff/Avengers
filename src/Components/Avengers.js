@@ -17,6 +17,7 @@ class Avengers extends React.Component{
 
         this.handleClick = this.handleClick.bind(this)
     }
+    
     RandomVillains(data){
         let random = data.sort(() => 0.5 - Math.random());
         let villains = random.slice(0,3);
@@ -134,17 +135,16 @@ function PrepareBattle (props){
     
 
      if(props.other === 3) {
-
+        
          //post method
             var id = 1  // id from the response
             localStorage.setItem('battleid', JSON.stringify(id));
 
         return(
             <div className="battle-row">
+
+                        <Link  to={'/battle/' + id}> <button className="btn btn-danger">Battle</button> </Link>
                     
-                    <button disabled={!props.buttonDisabled}  className="btn btn-danger">
-                        <Link to={'/battle/' + id}> Battle </Link>
-                    </button>
                     
             </div>
             )
