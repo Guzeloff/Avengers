@@ -1,42 +1,71 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { throwStatement } from '@babel/types';
+import { Link } from 'react-router-dom';
+import { Redirect } from 'react-router-dom'
+
 
 class Avengers extends React.Component{
     constructor(){
         super()
         this.state={
-            avengers: [
-                {id:1 ,  name: "Spiderman" , health:2700 , defence : 150 , attack:60 },
-                {id:2 ,  name:"Hulk" , health:1200 , defence : 250 , attack:460 },
-                {id:3 ,  name:"IronMan" , health:4200 , defence : 150 , attack:630 },
-                {id:4 ,  name:"CaptainAmerica" , health:3200 , defence : 150 , attack:460 },
-                {id:5 ,  name: "DrStrange" , health:5200 , defence : 4150 , attack:60 },
-                {id:6 ,  name: "Hawkeye" , health:5200 , defence : 4150 , attack:60 },
-                {id:7 ,  name: "Vision" , health:5200 , defence : 4150 , attack:60 },
-                {id:8 ,  name: "Thor" , health:5200 , defence : 4150 , attack:60 }
-                
-
-              
-            ],
+            avengers: [],
             avengersteam: [],
+            villains: [],
             picks:0 , 
-            buttonDisabled:false
+            buttonDisabled:false ,
         }
+
         this.handleClick = this.handleClick.bind(this)
     }
+    RandomVillains(data){
+        let random = data.sort(() => 0.5 - Math.random());
+        let villains = random.slice(0,3);
+        
+        this.setState({
+            villains:villains
+        })
+       //  console.log(villains)
+    }
+
+    componentDidMount(){
+        
+        var auth = 'Bearer ' + 'H4OUJ19yD5kKFvE31mkAhG0SJocdtqBQ'
+
+        fetch('http://localhost:3000/avengers', {
+            headers: {
+               Authorization: auth
+             } 
+        })
+        .then(response => response.json())
+        .then(data => this.setState({ avengers:data }));
+        
    
+
+        fetch('http://localhost:3000/villains', {
+            headers: {
+               Authorization: auth
+             } 
+        })
+        .then(response => response.json())
+        .then((data) => {
+            this.RandomVillains(data);
+          })
+
+       
+    }
+
     handleClick(e) {
         let id = e.currentTarget.id-1;
         e.target.classList = "btn btn-success btn-block"
+
             if(this.state.picks === 2){
                 this.setState({
                     buttonDisabled : true
                 })
+               
             }
             if(this.state.picks <= 2){
-                e.currentTarget.disabled = true;  //disabled button still listens onClick event
-               
+            e.currentTarget.disabled = true;  
             const selectedavenger = this.state.avengers[id];
             var avengersteam = this.state.avengersteam.slice();
              avengersteam.push(selectedavenger)
@@ -54,8 +83,10 @@ class Avengers extends React.Component{
         })
     
     }
-        console.log(this.state.picks)
-         console.log(avengersteam)
+    
+       // console.log(this.state.picks)
+        //  console.log(avengersteam)
+  
       }
       
     render(){
@@ -81,8 +112,8 @@ class Avengers extends React.Component{
                   
             </div>
             </div>
-                
-                    <PrepareBattle value={this.state.avengersteam} other={this.state.picks} button={this.state.buttonDisabled} />
+                    
+                    <PrepareBattle villain={this.state.villains} avenger={this.state.avengersteam} other={this.state.picks} button={this.state.buttonDisabled} />
             </div>
             
 
@@ -91,25 +122,40 @@ class Avengers extends React.Component{
     }
 
 }
-function PrepareBattle (props) {
+function PrepareBattle (props){
+
     if(props.other < 3){
         return(
         <div className="battle-row">
-                <button disabled={!props.buttonDisabled} className="btn btn-outline-danger">Battle</button>
+                <button disabled={!props.buttonDisabled}  className="btn btn-outline-danger">Battle</button>
         </div>
         )
     }
-     if(props.other == 3) {
+    
+
+     if(props.other === 3) {
+
+         //post method
+            var id = 1  // id from the response
+            localStorage.setItem('battleid', JSON.stringify(id));
+
         return(
             <div className="battle-row">
                     
-                    <button disabled={props.buttonDisabled} className="btn btn-danger">Battle</button>
-                    <p><i>Your Avenger team is ready to fight </i></p>
+                    <button disabled={!props.buttonDisabled}  className="btn btn-danger">
+                        <Link to={'/battle/' + id}> Battle </Link>
+                    </button>
+                    
             </div>
             )
     }
   
     
+     
+    
 }
+
+ 
+
 export default Avengers
 
